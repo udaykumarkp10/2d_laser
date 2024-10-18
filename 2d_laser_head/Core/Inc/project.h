@@ -14,6 +14,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "velocity_profile.h"
 
 #define PCAP_PORT      		hi2c1
 #define EEPROM_PORT    		hi2c2

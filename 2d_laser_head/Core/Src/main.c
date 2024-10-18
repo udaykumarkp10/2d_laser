@@ -179,11 +179,11 @@ int main(void)
    pcap_init_ok = pcap_init();
    Adxl345_init_ok = Adxl345_init();
 
-/*   if(initializeTMC4671(&tmc4671_controller)){
+   if(initializeTMC4671(&tmc4671_controller)){
 	   no_error_drive = true;
    } else {
 	   no_error_drive = false;
-   }*/
+   }
 
    HAL_Delay(200);
 
@@ -487,6 +487,29 @@ int main(void)
 					}
 					break;
 
+				case 20:
+					TxData = etc_new_data;
+					if ((etc_new_data < -12) || (etc_new_data > 12)) {//cannot be less than -12000um = -12mm or greater than 12000um = 12mm
+						setWrongCommandFlag(&tmc4671_controller, true);
+					} else {
+						//setWrongCommandFlag(&tmc4671_controller, false);
+						//setTargetVelocity(TMC4671_Controller *tmc4671_controller, int32_t target_microns_per_second);
+						command_processed = true;
+						continuous_tx_flag = false;
+					}
+					break;
+
+				case 21:
+					if ((etc_new_data < 40) || (etc_new_data > 1)) {//cannot be less than -12000um = -12mm or greater than 12000um = 12mm
+						setWrongCommandFlag(&tmc4671_controller, true);
+					} else {
+						//setWrongCommandFlag(&tmc4671_controller, false);
+						//setAccelerationLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t acceleration_limit);
+						command_processed = true;
+						continuous_tx_flag = false;
+					}
+					break;
+
 				case 100:
 					TxData = etc_new_data;
 					if ((etc_new_data != 0) && (etc_new_data != 1)) {//cannot be anything other than 0 or 1
@@ -731,14 +754,14 @@ int main(void)
 
 	  /*---------------------------------SERVO FUNCTIONALITY-----------------------------------------*/
 
-/*	  servoRun(&tmc4671_controller);
+	  servoRun(&tmc4671_controller);
 	  uint16_t current_status = getEventStatusWord(&tmc4671_controller, &Pcap_status);
 	  current_status |= 0b1110000011110000;
 	  if (current_status != 0b1110000011110000) {
 		  no_error_drive = false;
 	  } else {
 		  no_error_drive = true;
-	  }*/
+	  }
 
 	  /*---------------------------TRANSMIT DATA TO ETHERCAT ---------------------------------------------*/
 

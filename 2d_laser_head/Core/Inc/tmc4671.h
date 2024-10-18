@@ -1,11 +1,9 @@
-
 /*
  * tmc4671.h
  *
  *  Created on: May 17, 2024
  *      Author: Rajdeep
  */
-
 
 #ifndef INC_TMC4671_H_
 #define INC_TMC4671_H_
@@ -29,6 +27,7 @@ typedef struct{
 	uint32_t voltage_limit_homing;
 	uint32_t velocity_limit_servo;
 	uint32_t torque_limit_servo;
+	uint32_t acceleration_limit_servo;
 
 	uint32_t current_P_gain;
 	uint32_t current_I_gain;
@@ -59,9 +58,12 @@ typedef struct{
 typedef struct{
 	int32_t current_position;
 	int32_t target_position;
+	int32_t current_velocity;
+	int32_t target_velocity;
 	uint32_t motor_current;
 	Parameters tmc_parameters;
 	TMCStatusFlags tmc_flags;
+	Velocity_Profile speed_profile;
 }TMC4671_Controller;
 
 void setEncoderResolution(TMC4671_Controller *tmc4671_controller, uint32_t resolution_nanometers);
@@ -87,6 +89,9 @@ uint32_t getVoltageLimitHoming(TMC4671_Controller *tmc4671_controller);
 void setVelocityLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t velocity_limit);
 uint32_t getVelocityLimitServo(TMC4671_Controller *tmc4671_controller);
 
+void setAccelerationLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t acceleration_limit);
+uint32_t getAccelerationLimitServo(TMC4671_Controller *tmc4671_controller);
+
 void setTorqueLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t torque_limit);
 uint32_t getTorqueLimitServo(TMC4671_Controller *tmc4671_controller);
 
@@ -101,6 +106,11 @@ void setIncrementalTargetPosition(TMC4671_Controller *tmc4671_controller, int32_
 int32_t getTargetPosition(TMC4671_Controller *tmc4671_controller);
 
 int32_t getActualPosition(TMC4671_Controller *tmc4671_controller);
+
+void setTargetVelocity(TMC4671_Controller *tmc4671_controller, int32_t target_microns_per_second);
+int32_t getTargetVelocity(TMC4671_Controller *tmc4671_controller);
+
+int32_t getActualVelocity(TMC4671_Controller *tmc4671_controller);
 
 void setMaxPositionError(TMC4671_Controller *tmc4671_controller, uint32_t error_microns);
 uint32_t getMaxPositionError(TMC4671_Controller *tmc4671_controller);
@@ -309,13 +319,14 @@ void makeDefaultParametersCurrent();
 #define SET_ADC_I1_SCALE_OFFSET 			0x01000000
 
 // ABN encoder #define SETtings
-#define SET_ABN_DECODER_MODE 				0x00000100		//enable cln bit to auto load COUNT_N => COUNT on index pulse //0x00001100
+#define SET_ABN_DECODER_MODE 				0x00000100		//enable cln bit to auto load COUNT_N => COUNT on index pulse //0x00001100 {might need to disable this after homing done}
 #define SET_ABN_DECODER_COUNT 				0x00000000
 #define SET_ABN_DECODER_COUNT_N 			0x00000000
 #define SET_ABN_DECODER_PHI_E_PHI_M_OFFSET 	0x00000000
 #define TOTAL_MAPPED_TRAVEL_MICRONS			20000.0
 #define TOTAL_DECODER_REGISTER_COUNT		65536.0
 #define STOP_TOLERANCE_DECODER_COUNT		1638			//500 microns
+#define SET_ABN_DECODER_MODE_DIS 			0x00000000
 
 //selectors
 #define SET_PHI_E_SELECTION_ABN				0x00000003		//phi_e_abn
@@ -361,6 +372,8 @@ void makeDefaultParametersCurrent();
 #define DEF_ADDR_POSITION_P_GAIN			0x0080
 #define DEF_ADDR_POSITION_I_GAIN			0x0088
 
+#define DEF_ADDR_ACCEL_LIMIT_SERVO			0x0090
+
 #define DEF_ADDR_VERSION_NUMBER				0x0288
 
 //EEPROM-addresses-saved-values
@@ -386,30 +399,34 @@ void makeDefaultParametersCurrent();
 #define SAVE_ADDR_POSITION_P_GAIN			0x0180
 #define SAVE_ADDR_POSITION_I_GAIN			0x0188
 
+#define SAVE_ADDR_ACCEL_LIMIT_SERVO			0x0190
+
 //-----------------factory default values-----------------------------------------------------------
 
-#define DEFAULT_ENCODER_RESOLUTION		9940
-#define DEFAULT_ENCODER_DIRECTION		1
-#define DEFAULT_ENCODER_ZERO_OFFSET		0
-#define DEFAULT_SOFT_LIMIT_POSITIVE		16500
-#define DEFAULT_SOFT_LIMIT_NEGATIVE		-16500
-#define DEFAULT_POSITION_ERROR_LIMIT	33
+#define DEFAULT_ENCODER_RESOLUTION		10000	//2x: 10000		5x: 1000
+#define DEFAULT_ENCODER_DIRECTION		1		//2x: 1 		5x: 1
+#define DEFAULT_ENCODER_ZERO_OFFSET		0		//2x: 0		 	5x: 0
+#define DEFAULT_SOFT_LIMIT_POSITIVE		16500	//2x: 16500 	5x: 16500
+#define DEFAULT_SOFT_LIMIT_NEGATIVE		-16500	//2x: -16500	5x: -16500
+#define DEFAULT_POSITION_ERROR_LIMIT	33		//2x: 33		5x: 164
 
-#define DEFAULT_CURRENT_CENTER_VAL		33161
-#define DEFAULT_CURRENT_LIMIT_HOMING	1000     //1500
-#define DEFAULT_CURRENT_LIMIT_SERVO		7000
-#define DEFAULT_VOLTAGE_LIMIT_HOMING	3000     //5000
-#define DEFAULT_VELOCITY_LIMIT_SERVO	50
-#define DEFAULT_TORQUE_LIMIT_SERVO		10000
+#define DEFAULT_CURRENT_CENTER_VAL		32990	//2x: 32990		5x: 33161
+#define DEFAULT_CURRENT_LIMIT_HOMING	1500	//2x: 1500		5x: 1500
+#define DEFAULT_CURRENT_LIMIT_SERVO		4000	//2x: 4000		5x: 4000
+#define DEFAULT_VOLTAGE_LIMIT_HOMING	5000	//2x: 5000		5x: 5000
+#define DEFAULT_VELOCITY_LIMIT_SERVO	40		//2x: 40		5x: 30
+#define DEFAULT_TORQUE_LIMIT_SERVO		10000	//2x: 10000		5x: 8000
+#define DEFAULT_VELOCITY_STARTUP_SERVO	5		//2x: 5			5x: 5
+#define DEFAULT_ACCEL_LIMIT_SERVO		1		//2x: 1			5x: 1
 
-#define DEFAULT_CURRENT_P_GAIN			1700
-#define DEFAULT_CURRENT_I_GAIN			17500
-#define DEFAULT_VELOCITY_P_GAIN			6000
-#define DEFAULT_VELOCITY_I_GAIN			10500
-#define DEFAULT_POSITION_P_GAIN			120
-#define DEFAULT_POSITION_I_GAIN			0
+#define DEFAULT_CURRENT_P_GAIN			1500	//2x: 1500		5x: 1500
+#define DEFAULT_CURRENT_I_GAIN			6000	//2x: 6000		5x: 15000
+#define DEFAULT_VELOCITY_P_GAIN			800		//2x: 800		5x: 3000
+#define DEFAULT_VELOCITY_I_GAIN			2000	//2x: 2000		5x: 16000
+#define DEFAULT_POSITION_P_GAIN			50		//2x: 50		5x: 120
+#define DEFAULT_POSITION_I_GAIN			0		//2x: 0			5x: 0
 
-#define FIRMWARE_VERSION_NUMBER			202408
+#define FIRMWARE_VERSION_NUMBER			202410
 
 //-----------------PID error data------------------------------------------------------------------
 #define PID_TORQUE_ERROR 			0
@@ -422,5 +439,3 @@ void makeDefaultParametersCurrent();
 #define PID_POSITION_ERROR_SUM 		7
 
 #endif /* INC_TMC4671_H_ */
-
-

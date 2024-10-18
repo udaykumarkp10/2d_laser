@@ -4,8 +4,6 @@
  *  Created on: May 17, 2024
  *      Author: Rajdeep
  */
-
-
 #include "tmc4671.h"
 
 void stopMovement(TMC4671_Controller *tmc4671_controller){
@@ -17,6 +15,7 @@ void stopMovement(TMC4671_Controller *tmc4671_controller){
 	if(tmc4671_controller->target_position < tmc4671_controller->current_position - STOP_TOLERANCE_DECODER_COUNT){
 		setIncrementalTargetPosition(tmc4671_controller, -STOP_TOLERANCE_DECODER_COUNT);
 	}
+	tmc4671_controller->target_velocity = 0;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -189,6 +188,15 @@ uint32_t getVelocityLimitServo(TMC4671_Controller *tmc4671_controller){
 }
 //---------------------------------------------------------------------------------------------------------
 
+void setAccelerationLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t acceleration_limit){
+	tmc4671_controller->tmc_parameters.acceleration_limit_servo = acceleration_limit;
+}
+
+uint32_t getAccelerationLimitServo(TMC4671_Controller *tmc4671_controller){
+	return tmc4671_controller->tmc_parameters.acceleration_limit_servo;
+}
+//---------------------------------------------------------------------------------------------------------
+
 void setTorqueLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t torque_limit){
 	tmc4671_controller->tmc_parameters.torque_limit_servo = torque_limit;
 	write_register_tmc4671(TMC4671_PID_TORQUE_FLUX_LIMITS, torque_limit);
@@ -250,6 +258,8 @@ void setAbsoluteTargetPosition(TMC4671_Controller *tmc4671_controller, int32_t t
 		tmc4671_controller->tmc_flags.limits = SOFT_NEGATIVE;
 	}else{
 		tmc4671_controller->target_position = target_pos;
+		//add logic for motion profiler
+		StartVelocityProfile(&tmc4671_controller->speed_profile, (double)tmc4671_controller->current_position, (double)tmc4671_controller->target_position);
 	}
 }
 
@@ -262,6 +272,25 @@ int32_t getTargetPosition(TMC4671_Controller *tmc4671_controller){
 	int32_t target_pos = (tmc4671_controller->target_position - tmc4671_controller->tmc_parameters.encoder_zero_offset);
 	target_pos = (int32_t)((target_pos*TOTAL_MAPPED_TRAVEL_MICRONS)/TOTAL_DECODER_REGISTER_COUNT);
 	return target_pos;
+}
+//---------------------------------------------------------------------------------------------------------
+
+int32_t getActualVelocity(TMC4671_Controller *tmc4671_controller){
+	int32_t actual_microns_per_second = tmc4671_controller->current_velocity;
+	actual_microns_per_second = (int32_t)((actual_microns_per_second*TOTAL_MAPPED_TRAVEL_MICRONS)/TOTAL_DECODER_REGISTER_COUNT);
+	return actual_microns_per_second;
+}
+//---------------------------------------------------------------------------------------------------------
+
+void setTargetVelocity(TMC4671_Controller *tmc4671_controller, int32_t target_microns_per_second){
+	int32_t target_pos_per_second = (int32_t)(target_microns_per_second*(TOTAL_DECODER_REGISTER_COUNT/TOTAL_MAPPED_TRAVEL_MICRONS));
+	tmc4671_controller->target_velocity = target_pos_per_second;
+}
+
+int32_t getTargetVelocity(TMC4671_Controller *tmc4671_controller){
+	int32_t target_microns_per_second = tmc4671_controller->target_velocity;
+	target_microns_per_second = (int32_t)((target_microns_per_second*TOTAL_MAPPED_TRAVEL_MICRONS)/TOTAL_DECODER_REGISTER_COUNT);
+	return target_microns_per_second;
 }
 //---------------------------------------------------------------------------------------------------------
 
@@ -398,8 +427,10 @@ bool initializeTMC4671(TMC4671_Controller *tmc4671_controller){
 	}
 
 	tmc4671_controller->current_position = 0;
+	tmc4671_controller->current_velocity = 0;
 	tmc4671_controller->motor_current = 0;
 	tmc4671_controller->target_position = 0;
+	tmc4671_controller->target_velocity = 0;
 
 	tmc4671_controller->tmc_flags.servo_ready = false;
 	tmc4671_controller->tmc_flags.servo_enable = false;
@@ -431,12 +462,15 @@ bool initializeTMC4671(TMC4671_Controller *tmc4671_controller){
 		return false;
 	}
 
+	InitializeVelocityProfile(&tmc4671_controller->speed_profile, DEFAULT_VELOCITY_LIMIT_SERVO, tmc4671_controller->tmc_parameters.acceleration_limit_servo, DEFAULT_VELOCITY_STARTUP_SERVO);
+
 	return true;
 }
 //---------------------------------------------------------------------------------------------------------
 
 void servoRun(TMC4671_Controller *tmc4671_controller){
 	tmc4671_controller->current_position = get_position();
+	tmc4671_controller->current_velocity = get_velocity();
 	tmc4671_controller->motor_current = get_motor_current();
 
 	if(tmc4671_controller->motor_current > tmc4671_controller->tmc_parameters.current_centre_value + tmc4671_controller->tmc_parameters.current_limit_servo){
@@ -449,6 +483,7 @@ void servoRun(TMC4671_Controller *tmc4671_controller){
 
 	if((tmc4671_controller->tmc_flags.limits == HARD_POSITIVE) || tmc4671_controller->tmc_flags.limits == HARD_NEGATIVE){
 		control_disable();
+		setTargetVelocity(tmc4671_controller, 0);
 		setAbsoluteTargetPosition(tmc4671_controller, 0);
 	}else{
 		if(tmc4671_controller->tmc_flags.servo_enable){
@@ -456,7 +491,14 @@ void servoRun(TMC4671_Controller *tmc4671_controller){
 		}else{
 			control_disable();
 		}
-		set_position(tmc4671_controller->target_position);
+
+		int32_t target_vel = (int32_t)ComputeProfileSpeed(&tmc4671_controller->speed_profile, (double)tmc4671_controller->current_position);
+		if(target_vel != 0){
+			set_velocity(target_vel);
+		}else{
+			set_position(tmc4671_controller->target_position);
+			SetVelocityProfileZero(&tmc4671_controller->speed_profile);
+		}
 	}
 
 	GPIO_PinState check = HAL_GPIO_ReadPin(TMC_STATUS_GPIO_Port, TMC_STATUS_Pin);
@@ -482,6 +524,13 @@ void servoRun(TMC4671_Controller *tmc4671_controller){
 //---------------------------------------------------------------------------------------------------------
 
 void startHoming(TMC4671_Controller *tmc4671_controller){
+	// ABN encoder settings
+	uint32_t encoder_dir = tmc4671_controller->tmc_parameters.encoder_direction;
+	encoder_dir &= 0x00000001;
+	uint32_t abn_decoder_mode = SET_ABN_DECODER_MODE | (encoder_dir << 12);
+	write_register_tmc4671(TMC4671_ABN_DECODER_MODE, abn_decoder_mode);
+	//---------------------
+
 	tmc4671_controller->tmc_flags.homing_done = false;
 	control_enable();
 	write_register_tmc4671(TMC4671_MODE_RAMP_MODE_MOTION, SET_MOTION_MODE_UQ_UD);
@@ -525,6 +574,13 @@ void startHoming(TMC4671_Controller *tmc4671_controller){
 	}
 	tmc4671_controller->tmc_flags.homing_done = true;
 	tmc4671_controller->target_position = 0;
+	tmc4671_controller->target_velocity = 0;
+
+	// ABN encoder settings
+	encoder_dir = tmc4671_controller->tmc_parameters.encoder_direction;
+	encoder_dir &= 0x00000001;
+	abn_decoder_mode = SET_ABN_DECODER_MODE_DIS | (encoder_dir << 12);
+	write_register_tmc4671(TMC4671_ABN_DECODER_MODE, abn_decoder_mode);
 }
 //---------------------------------------------------------------------------------------------------------
 
@@ -823,6 +879,9 @@ void loadDefaultParameters(TMC4671_Controller *tmc4671_controller){
 
 	EEPROM_Read(DEF_ADDR_TORQUE_LIMIT_SERVO, temp_bytes, 4);
 	tmc4671_controller->tmc_parameters.torque_limit_servo = bytes2uInt(temp_bytes);
+
+	EEPROM_Read(DEF_ADDR_ACCEL_LIMIT_SERVO, temp_bytes, 4);
+	tmc4671_controller->tmc_parameters.acceleration_limit_servo = bytes2uInt(temp_bytes);
 }
 //---------------------------------------------------------------------------------------------------------
 
@@ -884,6 +943,9 @@ void loadParameters(TMC4671_Controller *tmc4671_controller){
 
 	EEPROM_Read(SAVE_ADDR_TORQUE_LIMIT_SERVO, temp_bytes, 4);
 	tmc4671_controller->tmc_parameters.torque_limit_servo = bytes2uInt(temp_bytes);
+
+	EEPROM_Read(SAVE_ADDR_ACCEL_LIMIT_SERVO, temp_bytes, 4);
+	tmc4671_controller->tmc_parameters.acceleration_limit_servo = bytes2uInt(temp_bytes);
 }
 //---------------------------------------------------------------------------------------------------------
 
@@ -910,6 +972,7 @@ void saveParameters(TMC4671_Controller *tmc4671_controller){
 	tempParameters.voltage_limit_homing = tmc4671_controller->tmc_parameters.voltage_limit_homing;
 	tempParameters.velocity_limit_servo = tmc4671_controller->tmc_parameters.velocity_limit_servo;
 	tempParameters.torque_limit_servo = tmc4671_controller->tmc_parameters.torque_limit_servo;
+	tempParameters.acceleration_limit_servo = tmc4671_controller->tmc_parameters.acceleration_limit_servo;
 
 	uint8_t temp_bytes[4];
 
@@ -966,6 +1029,9 @@ void saveParameters(TMC4671_Controller *tmc4671_controller){
 
 	uInt2Bytes(temp_bytes, tempParameters.torque_limit_servo);
 	EEPROM_Write(SAVE_ADDR_TORQUE_LIMIT_SERVO, temp_bytes, 4);
+
+	uInt2Bytes(temp_bytes, tempParameters.acceleration_limit_servo);
+	EEPROM_Write(SAVE_ADDR_ACCEL_LIMIT_SERVO, temp_bytes, 4);
 }
 //---------------------------------------------------------------------------------------------------------
 
@@ -992,6 +1058,7 @@ void makeDefaultParametersCurrent(){
 	factoryDefaults.voltage_limit_homing = DEFAULT_VOLTAGE_LIMIT_HOMING;
 	factoryDefaults.velocity_limit_servo = DEFAULT_VELOCITY_LIMIT_SERVO;
 	factoryDefaults.torque_limit_servo = DEFAULT_TORQUE_LIMIT_SERVO;
+	factoryDefaults.acceleration_limit_servo = DEFAULT_ACCEL_LIMIT_SERVO;
 
 	uint8_t temp_bytes[4];
 
@@ -1048,6 +1115,9 @@ void makeDefaultParametersCurrent(){
 
 	uInt2Bytes(temp_bytes, factoryDefaults.torque_limit_servo);
 	EEPROM_Write(SAVE_ADDR_TORQUE_LIMIT_SERVO, temp_bytes, 4);
+
+	uInt2Bytes(temp_bytes, factoryDefaults.acceleration_limit_servo);
+	EEPROM_Write(SAVE_ADDR_ACCEL_LIMIT_SERVO, temp_bytes, 4);
 }
 //---------------------------------------------------------------------------------------------------------
 
@@ -1074,6 +1144,7 @@ void saveDefaultParameters(){
 	factoryDefaults.voltage_limit_homing = DEFAULT_VOLTAGE_LIMIT_HOMING;
 	factoryDefaults.velocity_limit_servo = DEFAULT_VELOCITY_LIMIT_SERVO;
 	factoryDefaults.torque_limit_servo = DEFAULT_TORQUE_LIMIT_SERVO;
+	factoryDefaults.acceleration_limit_servo = DEFAULT_ACCEL_LIMIT_SERVO;
 
 	uint8_t temp_bytes[4];
 
@@ -1130,6 +1201,9 @@ void saveDefaultParameters(){
 
 	uInt2Bytes(temp_bytes, factoryDefaults.torque_limit_servo);
 	EEPROM_Write(DEF_ADDR_TORQUE_LIMIT_SERVO, temp_bytes, 4);
+
+	uInt2Bytes(temp_bytes, factoryDefaults.acceleration_limit_servo);
+	EEPROM_Write(DEF_ADDR_ACCEL_LIMIT_SERVO, temp_bytes, 4);
 
 	uInt2Bytes(temp_bytes, FIRMWARE_VERSION_NUMBER);
 	EEPROM_Write(DEF_ADDR_VERSION_NUMBER, temp_bytes, 4);

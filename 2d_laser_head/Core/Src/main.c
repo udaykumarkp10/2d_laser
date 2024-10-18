@@ -504,6 +504,7 @@ int main(void)
 //					startHoming(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
+					command_processed = true;
 					break;
 
 				case 102:
@@ -511,6 +512,7 @@ int main(void)
 //					clearFaults(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
+					command_processed = true;
 					break;
 
 				case 103:
@@ -518,6 +520,7 @@ int main(void)
 					//saveParameters(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
+					command_processed = true;
 					break;
 
 				case 104:
@@ -525,6 +528,7 @@ int main(void)
 					//loadDefaultParameters(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
+					command_processed = true;
 					break;
 
 				case 105:
@@ -532,6 +536,7 @@ int main(void)
 					//stopMovement(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
+					command_processed = true;
 					break;
 
 				default:
@@ -737,11 +742,11 @@ int main(void)
 
 	  /*---------------------------TRANSMIT DATA TO ETHERCAT ---------------------------------------------*/
 
-	  if (set_command_flag && command_processed) {
-		  if (!continuous_tx_flag) {
+	  if (set_command_flag) {
+		  if (!continuous_tx_flag && command_processed) {
 			  set_sent_count++;
 			  TxStatus = getEventStatusWord(&tmc4671_controller, &Pcap_status);
-			  Etc_Buffer_In.LANLong[0] = ((uint32_t)TxStatus << 16) | (uint32_t)etc_new_command;
+			  Etc_Buffer_In.LANLong[0] = ((uint32_t)TxStatus << 16) | (uint32_t)etc_old_command;
 			  Etc_Buffer_In.LANLong[1] = TxData;
 			  continuous_tx_flag = true;  // Mark that data has been sent
 		  }
@@ -761,7 +766,7 @@ int main(void)
 		  adxl_sent_count++;
 		  TxStatus = getEventStatusWord(&tmc4671_controller, &Pcap_status);
 		  Etc_Buffer_In.LANLong[0] = ((uint32_t) TxStatus << 16) | (uint32_t) etc_new_command;
-		  Etc_Buffer_In.LANLong[1] = TxData;
+		  Etc_Buffer_In.LANLong[1] = (int32_t)TxData;
 	  }
 
 

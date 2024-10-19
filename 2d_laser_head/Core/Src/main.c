@@ -263,7 +263,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setEncoderResolution(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -276,7 +276,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setEncoderDirection(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -288,7 +288,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setZeroOffset(&tmc4671_controller, (int32_t) etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -300,7 +300,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setSoftPositiveLimit(&tmc4671_controller, (int32_t) etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -312,7 +312,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setSoftNegativeLimit(&tmc4671_controller, (int32_t) etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -324,7 +324,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setMaxPositionError(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -336,7 +336,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setCurrentLimitHoming(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -348,7 +348,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setCurrentLimitServo(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -360,7 +360,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setVoltageLimitHoming(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -372,7 +372,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setVelocityLimitServo(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -384,7 +384,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setTorqueLimitServo(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -396,7 +396,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setCurrentGainP(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -408,7 +408,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setCurrentGainI(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -420,7 +420,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setVelocityGainP(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -433,7 +433,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setVelocityGainI(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -445,7 +445,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setPositionGainP(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -457,7 +457,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setPositionGainI(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -469,7 +469,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setAbsoluteTargetPosition(&tmc4671_controller, (int32_t) etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -481,7 +481,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						setIncrementalTargetPosition(&tmc4671_controller, (int32_t) etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -492,19 +492,19 @@ int main(void)
 					if ((etc_new_data < -12) || (etc_new_data > 12)) {//cannot be less than -12000um = -12mm or greater than 12000um = 12mm
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
-						//setWrongCommandFlag(&tmc4671_controller, false);
-						//setTargetVelocity(TMC4671_Controller *tmc4671_controller, int32_t target_microns_per_second);
+						setWrongCommandFlag(&tmc4671_controller, false);
+//						setTargetVelocity(&tmc4671_controller, etc_new_data);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
 					break;
 
 				case 21:
-					if ((etc_new_data < 40) || (etc_new_data > 1)) {//cannot be less than -12000um = -12mm or greater than 12000um = 12mm
+					if ((etc_new_data < 1) || (etc_new_data > 40)) {//cannot be less than -12000um = -12mm or greater than 12000um = 12mm
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
-						//setWrongCommandFlag(&tmc4671_controller, false);
-						//setAccelerationLimitServo(TMC4671_Controller *tmc4671_controller, uint32_t acceleration_limit);
+						setWrongCommandFlag(&tmc4671_controller, false);
+//						setAccelerationLimitServo(&tmc4671_controller, etc_new_data);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -516,7 +516,7 @@ int main(void)
 						setWrongCommandFlag(&tmc4671_controller, true);
 					} else {
 //						servoEnable(&tmc4671_controller, etc_new_data);
-//						setWrongCommandFlag(&tmc4671_controller, false);
+						setWrongCommandFlag(&tmc4671_controller, false);
 						command_processed = true;
 						continuous_tx_flag = false;
 					}
@@ -540,7 +540,7 @@ int main(void)
 
 				case 103:
 					TxData = 0;
-					//saveParameters(&tmc4671_controller);
+//					saveParameters(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
 					command_processed = true;
@@ -548,7 +548,7 @@ int main(void)
 
 				case 104:
 					TxData = 0;
-					//loadDefaultParameters(&tmc4671_controller);
+//					loadDefaultParameters(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
 					command_processed = true;
@@ -556,7 +556,7 @@ int main(void)
 
 				case 105:
 					TxData = 0;
-					//stopMovement(&tmc4671_controller);
+//					stopMovement(&tmc4671_controller);
 					setWrongCommandFlag(&tmc4671_controller, false);
 					continuous_tx_flag = false;
 					command_processed = true;
@@ -571,41 +571,32 @@ int main(void)
 	  } else if (get_command_flag) {
 		  switch(etc_new_command) {
 			case 50:
-				TxData = (uint32_t)1000;
-				//TxData = getEncoderResolution(&tmc4671_controller);
+				TxData = getEncoderResolution(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
 				break;
 
 			case 51:
-				//TxData = getEncoderDirection(&tmc4671_controller);
+				TxData = getEncoderDirection(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
 				break;
 
 			case 52:
-				// int32_t zero_offset = getZeroOffset(&tmc4671_controller);
-				// TxData = (uint32_t) zero_offset;  // Cast int32_t to uint32_t
 				 TxData = getZeroOffset(&tmc4671_controller);
 				 setWrongCommandFlag(&tmc4671_controller, false);
 				 continuous_tx_flag = true;
 				 break;
 
 			case 53:
-				TxData = -1000;
-			//	int32_t soft_pos_limit = getSoftPositiveLimit(&tmc4671_controller);
-			//	TxData = (uint32_t) soft_pos_limit;  // Cast int32_t to uint32_t
-				//TxData = getSoftPositiveLimit(&tmc4671_controller);
+				TxData = getSoftPositiveLimit(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
 				break;
 
 
 			case 54:
-				TxData = -80000;
-			//	int32_t soft_neg_limit = getSoftNegativeLimit(&tmc4671_controller);
-			//	TxData = (uint32_t) soft_neg_limit;  // Cast int32_t to uint32_t
-			//	TxData =  getSoftNegativeLimit(&tmc4671_controller);
+				TxData =  getSoftNegativeLimit(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
 				break;
@@ -617,7 +608,7 @@ int main(void)
 				break;
 
 			case 56:
-				TxData = getCurrentLimitHoming(&tmc4671_controller);
+			    TxData = getCurrentLimitHoming(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
 				break;
@@ -683,16 +674,12 @@ int main(void)
 				break;
 
 			case 67:
-			//	int32_t target_position = getTargetPosition(&tmc4671_controller);
-			//	TxData = (uint32_t) target_position;  // Cast int32_t to uint32_t
 				TxData = getTargetPosition(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
 				break;
 
 			case 68:
-			//	int32_t actual_position = getActualPosition(&tmc4671_controller);
-			//	TxData = (uint32_t) actual_position;  // Cast int32_t to uint32_t
 				TxData = getActualPosition(&tmc4671_controller);
 				setWrongCommandFlag(&tmc4671_controller, false);
 				continuous_tx_flag = true;
@@ -710,9 +697,26 @@ int main(void)
 				continuous_tx_flag = true;
 				break;
 
+			case 71:
+				TxData = getTargetVelocity(&tmc4671_controller);
+				setWrongCommandFlag(&tmc4671_controller, false);
+				continuous_tx_flag = true;
+				break;
+
+			case 72:
+				TxData = getActualVelocity(&tmc4671_controller);
+				setWrongCommandFlag(&tmc4671_controller, false);
+				continuous_tx_flag = true;
+				break;
+
+			case 73:
+				TxData = getAccelerationLimitServo(&tmc4671_controller);
+				setWrongCommandFlag(&tmc4671_controller, false);
+				continuous_tx_flag = true;
+				break;
+
 			case 200:
 				TxData = 0;
-				get_Execution_count++;
 				setWrongCommandFlag(&tmc4671_controller, false);
 				TxStatus = getEventStatusWord(&tmc4671_controller, &Pcap_status);
 				continuous_tx_flag = false;

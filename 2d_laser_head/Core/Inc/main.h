@@ -1,5 +1,4 @@
-/* USER CODE BEGIN Header */
-/**
+/* USER CODE BEGIN Header *//**
   ******************************************************************************
   * @file           : main.h
   * @brief          : Header for main.c file.

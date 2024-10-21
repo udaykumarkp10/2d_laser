@@ -62,13 +62,13 @@ PcapErrorStatus pcap_scan(){
 	if(ret != HAL_OK){
 		printf("Error sending RD STS command, code = %d\n", ret);
 		errorStatus |= PCAP_COMM_ERROR;
-		return;
+		return errorStatus;
 	}else{
 		ret = HAL_I2C_Master_Receive(&PCAP_PORT, PCAP_ADDR, buf, 2, PCAP_MAX_DELAY);
 		if(ret != HAL_OK){
 			printf("Bad response while reading RD STS command, bytes received = %d\n", ret);
 			errorStatus |= PCAP_COMM_ERROR;
-			return;
+			return errorStatus;
 		}else{
 			uint16_t pcap_sts = ((uint16_t)buf[1] << 8) | (uint16_t)buf[0];
 			errorStatus = PCAP_NO_ERROR;
@@ -83,13 +83,13 @@ PcapErrorStatus pcap_scan(){
 	if(ret != HAL_OK){
 		printf("Error sending RD CAP command, code = %d\n", ret);
 		Etc_Buffer_In.LANByte[5] |= PCAP_COMM_ERROR;
-		return;
+		return errorStatus;
 	}else{
 		ret = HAL_I2C_Master_Receive(&PCAP_PORT, PCAP_ADDR, buf, 4, PCAP_MAX_DELAY);
 		if(ret != HAL_OK){
 			printf("Bad response while reading RD CAP command, bytes received = %d\n", ret);
 			errorStatus |= PCAP_COMM_ERROR;
-			return;
+			return errorStatus;
 		}else{
 			pcap_capval_check1 = ((uint32_t)buf[3] << 24) | ((uint32_t)buf[2] << 16) | ((uint32_t)buf[1] << 8) | (uint32_t)buf[0];
 
@@ -101,13 +101,13 @@ PcapErrorStatus pcap_scan(){
 			if(ret != HAL_OK){
 				printf("Error sending RD CAP command, code = %d\n", ret);
 				errorStatus |= PCAP_COMM_ERROR;
-				return;
+				return errorStatus;
 			}else{
 				ret = HAL_I2C_Master_Receive(&PCAP_PORT, PCAP_ADDR, buf, 4, PCAP_MAX_DELAY);
 				if(ret != HAL_OK){
 					printf("Bad response while reading RD CAP command, bytes received = %d\n", ret);
 					errorStatus |= PCAP_COMM_ERROR;
-					return;
+					return errorStatus;
 				}else{
 					pcap_capval_check2 = ((uint32_t)buf[3] << 24) | ((uint32_t)buf[2] << 16) | ((uint32_t)buf[1] << 8) | (uint32_t)buf[0];
 
@@ -145,13 +145,13 @@ PcapErrorStatus pcap_scan(){
 	if(ret != HAL_OK){
 		printf("Error sending RD CAP command, code = %d\n", ret);
 		errorStatus |= PCAP_COMM_ERROR;
-		return;
+		return errorStatus;
 	}else{
 		ret = HAL_I2C_Master_Receive(&PCAP_PORT, PCAP_ADDR, buf, 4, PCAP_MAX_DELAY);
 		if(ret != HAL_OK){
 			printf("Bad response while reading RD CAP command, bytes received = %d\n", ret);
 			errorStatus |= PCAP_COMM_ERROR;
-			return;
+			return errorStatus;
 		}else{
 			pcap_tempval = ((uint32_t)buf[3] << 24) | ((uint32_t)buf[2] << 16) | ((uint32_t)buf[1] << 8) | (uint32_t)buf[0];
 			Etc_Buffer_In.LANLong[3] = pcap_tempval;

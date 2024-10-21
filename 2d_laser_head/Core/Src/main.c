@@ -204,6 +204,7 @@ int main(void)
 		  Pcap_status = pcap_scan();
 	  } else {
 		  pcap_init_ok = pcap_init();
+		  Pcap_status = PCAP_COMM_ERROR;
 	  }
 
 	  if (etc_init_ok) {

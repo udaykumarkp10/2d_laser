@@ -201,7 +201,7 @@ int main(void)
 	  /*-------------------------- GET DATA FROM PCAP AND ETHERCAT----------------------------------------*/
 
 	  if (pcap_init_ok) {
-		  pcap_scan();
+		  Pcap_status = pcap_scan();
 	  } else {
 		  pcap_init_ok = pcap_init();
 	  }
@@ -217,13 +217,13 @@ int main(void)
 	  etc_new_command = (uint16_t)Etc_Buffer_Out.LANLong[0];
 	  etc_new_data =  (int32_t) Etc_Buffer_Out.LANLong[1];
 
-	  if (((etc_new_command >= 0) && (etc_new_command <= 19)) || ((etc_new_command >= 100) && (etc_new_command <= 105))) {
+	  if (((etc_new_command >= 0) && (etc_new_command <= 21)) || ((etc_new_command >= 100) && (etc_new_command <= 105))) {
 	      set_command_flag = true;
 	  } else {
 		  set_command_flag = false;
 	  }
 
-	  if ((etc_new_command >= 50 && etc_new_command <= 70)) {
+	  if ((etc_new_command >= 50 && etc_new_command <= 73) || (etc_new_command == 200)) {
 		  get_command_flag = true;
 	  } else {
 		  get_command_flag = false;
